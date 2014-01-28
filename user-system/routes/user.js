@@ -89,7 +89,7 @@ module.exports = function(app) {
 						if (err) throw err;
 						req.session.succ = 'Register successfully';
 						res.redirect('/user/register');
-			        });
+					});
 				}
 			});
 		}
@@ -143,6 +143,4 @@ module.exports = function(app) {
 			user: req.session.user
 		});
 	});
-
-	
 };
