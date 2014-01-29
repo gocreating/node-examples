@@ -1,7 +1,7 @@
 var mongoose = require('./db');
 
 var articleSchema = new mongoose.Schema({
-	author: 	  mongoose.Schema.ObjectId,
+	author: 	  {type: mongoose.Schema.ObjectId, ref:'users'},
 	postTime: 	  Date,
 	lastEditTime: Date,
 	title: 		  String,

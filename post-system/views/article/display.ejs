@@ -4,12 +4,16 @@
 		<title><%= title %></title>
 	</head>
 	<body>
-		<p>Author:<%=author.email %></p>
+		<% if (isSelf) { %>
+			<a href="/article/edit/<%=article._id %>">Edit</a>
+			<a href="/article/delete/<%=article._id %>/<%=article.author._id %>">Delete</a>
+		<% } %>
+		<p>Author:<%=article.author.email %></p>
 		<hr>
 		<p>Title:<%=article.title %></p>
 		<p>Post time:<%=article.postTime %></p>
 		<p>Last edit time:<%=article.lastEditTime %></p>
 		<p>Content:<%=article.content %></p>
-		<a href="/article/all">Go to Article List</a>
+		<a href="/article">Go to Article List</a>
 	</body>
 </html>

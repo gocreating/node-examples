@@ -1,4 +1,5 @@
-var User = require('../models/user');
+var mw   = require('./middlewares'),
+	User = require('../models/user');
 
 // To prevent blank data or injection
 function checkData(req, res, next) {
@@ -63,13 +64,13 @@ module.exports = function(app) {
 	});
 
 	// Login
-	app.get('/user/login', function(req, res) {
+	app.get('/user/login', mw.unauth, function(req, res) {
 		res.render('user/login', {
 			title: 'Login'
 		});
 	});
 
-	app.post('/user/login', checkData, function(req, res) {
+	app.post('/user/login', mw.unauth, checkData, function(req, res) {
 		var email    = req.body.email;
 		var password = req.body.password;
 
@@ -85,7 +86,7 @@ module.exports = function(app) {
 				req.session.user = user;
 				if (req.session.previousPage != undefined) {
 					// Redirect to the previous page prior to login page
-					// It is recorded in routes/special
+					// It is recorded in mw.unauth
 					res.redirect(req.session.previousPage);
 					delete req.session.previousPage;
 				} else {
@@ -99,7 +100,7 @@ module.exports = function(app) {
 	});
 
 	// Logout
-	app.get('/user/logout', function(req, res) {
+	app.get('/user/logout', mw.auth, function(req, res) {
 		req.session.isAuth = false;
 		delete req.session.user;
 		req.session.succ = 'Logout successfully.';
@@ -107,7 +108,7 @@ module.exports = function(app) {
 	});
 
 	// Auth pages
-	app.get('/user/auth/info', function(req, res) {
+	app.get('/user/auth/info', mw.auth, function(req, res) {
 		res.render('user/auth/info', {
 			title: 'User Information',
 			user: req.session.user

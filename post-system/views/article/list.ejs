@@ -7,8 +7,9 @@
 		<ul>
 			<% articles.forEach(function(article) { %>
 				<li>
-					<a href="<%=article._id %>">
+					<a href="/article/<%=article._id %>/<%=article.author._id %>">
 						Title:<%=article.title %>
+						(<%=article.author.email %>)
 					</a>
 				</li>
 			<% }); %>

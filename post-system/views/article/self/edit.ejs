@@ -4,18 +4,21 @@
 		<title><%= title %></title>
 	</head>
 	<body>
-		<form action="/user/register" method="post">
+		<form action="/article/edit/<%=article._id %>" method="post">
 			<p><%=msg %></p>
+			<input name="uid" type="hidden" value="<%=article.author._id %>" />
 			<p>
-				E-mail:<input name="email" type="text" />
+				<input
+					name="title"
+					type="text"
+					placeholder="Title"
+					value="<%=article.title %>" />
 			</p>
 			<p>
-				Password:<input name="password" type="password" />
+				<textarea name="content" placeholder="Content"><%=article.content %></textarea>
 			</p>
-			<p>
-				<input type="submit" value="Finish" />
-			</p>
+			<a href="/article/<%=article._id %>">Cancel</a>
+			<p><input type="submit" value="Update" /></p>
 		</form>
-		<a href="/">Go Home</a>
 	</body>
 </html>

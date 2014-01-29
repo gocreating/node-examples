@@ -3,9 +3,9 @@
  * Module dependencies.
  */
 
-var express	= require('express'),
-	http 	= require('http'),
-	path	= require('path');
+var express    = require('express'),
+	http	   = require('http'),
+	path	   = require('path');
 
 var app = express();
 
@@ -19,7 +19,12 @@ app.configure(function() {
 	app.use(express.bodyParser());
 	app.use(express.methodOverride());
 	app.use(express.cookieParser('your secret here'));
-	app.use(express.session());
+	app.use(express.session({
+		cookie: {
+			expires: new Date(Date.now() + 40*60*1000),
+			maxAge: 40*60*1000 // Expires after 40 minutes
+		}
+	}));
 	
 	app.use(express.static(path.join(__dirname, 'public')));
 
@@ -28,6 +33,7 @@ app.configure(function() {
 		if (req.session.isAuth == undefined) {
 			req.session.isAuth = false;
 		}
+		res.locals.isAuth = req.session.isAuth;
 		next();
 	});
 
@@ -82,7 +88,6 @@ if ('development' == app.get('env')) {
 
 // Custom routing
 require('./routes/general')(app);
-require('./routes/special')(app);
 require('./routes/user')(app);
 require('./routes/article')(app);
 
