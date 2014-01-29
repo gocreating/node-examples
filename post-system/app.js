@@ -82,7 +82,9 @@ if ('development' == app.get('env')) {
 
 // Custom routing
 require('./routes/general')(app);
+require('./routes/special')(app);
 require('./routes/user')(app);
+require('./routes/article')(app);
 
 http.createServer(app).listen(app.get('port'), function(){
 	console.log('Express server listening on port ' + app.get('port'));

@@ -1,65 +1,36 @@
 var User = require('../models/user');
 
 // To prevent blank data or injection
-function isDataError(req, email, password) {
-	if (email == '') {
+function checkData(req, res, next) {
+	if (req.body.email == '') {
 		req.session.err = 'Empty email';
-		return true;
+		res.redirect(req.route.path);
+		return;
 	}
 
-	if (password == '') {
+	if (req.body.password == '') {
 		req.session.err = 'Empty password.';
-		return true;
+		res.redirect(req.route.path);
+		return;
 	}
 
-	if (email.length > 35) {
+	if (req.body.email.length > 35) {
 		req.session.err = 'Email can\'t be more than 35 characters.';
-		return true;
+		res.redirect(req.route.path);
+		return;
 	}
 
-	if (password.length > 35) {
+	if (req.body.password.length > 35) {
 		req.session.err = 'Password can\'t be more than 35 characters.';
-		return true;
+		res.redirect(req.route.path);
+		return;
 	}
 
-	return false;
+	next();
 }
 
 // Routing
 module.exports = function(app) {
-	// Prevent an authorized user from logging in again
-	app.get('/user/login', function(req, res, next) {
-		if (req.session.isAuth) {
-			res.render('err/authorized', {
-				title: 'Authorized'
-			});
-		} else {
-			next();
-		}
-	});
-
-	// Prevent an unauthorized user from logging out
-	app.get('/user/logout', function(req, res, next) {
-		if (req.session.isAuth) {
-			next();
-		} else {
-			res.render('err/unauthorized', {
-				title: 'Unauthorized'
-			});
-		}
-	});
-
-	// Authorized page
-	app.get('/user/auth/*', function(req, res, next) {
-		if (req.session.isAuth) {
-			next();
-		} else {
-			res.render('err/unauthorized', {
-				title: 'Unauthorized'
-			});
-		}
-	});
-
 	// Register
 	app.get('/user/register', function(req, res) {
 		res.render('user/register', {
@@ -67,32 +38,28 @@ module.exports = function(app) {
 		});
 	});
 
-	app.post('/user/register', function(req, res) {
+	app.post('/user/register', checkData, function(req, res) {
 		var email    = req.body.email;
 		var password = req.body.password;
 
-		if (isDataError(req, email, password)) {
-			res.redirect('/user/register');
-		} else {
-			var user = new User({
-				email: email,
-				password: password
-			});
+		var user = new User({
+			email: email,
+			password: password
+		});
 
-			// Check whether the email exists
-			user.checkUserExist(function (err, isExist) {
-				if (isExist) {
-					req.session.err = 'This email has been used.';
+		// Check whether the email exists
+		user.checkUserExist(function (err, isExist) {
+			if (isExist) {
+				req.session.err = 'This email has been used.';
+				res.redirect('/user/register');
+			} else {
+				user.save(function (err, newUser) {
+					if (err) throw err;
+					req.session.succ = 'Register successfully';
 					res.redirect('/user/register');
-				} else {
-					user.save(function (err, newUser) {
-						if (err) throw err;
-						req.session.succ = 'Register successfully';
-						res.redirect('/user/register');
-					});
-				}
-			});
-		}
+				});
+			}
+		});
 	});
 
 	// Login
@@ -102,30 +69,33 @@ module.exports = function(app) {
 		});
 	});
 
-	app.post('/user/login', function(req, res) {
+	app.post('/user/login', checkData, function(req, res) {
 		var email    = req.body.email;
 		var password = req.body.password;
 
-		if (isDataError(req, email, password)) {
-			res.redirect('/user/register');
-		} else {
-			var user = new User({
-				email: email,
-				password: password
-			});
+		var user = new User({
+			email: email,
+			password: password
+		});
 
-			user.auth(function (err, user) {
-				if (err) throw err;
-				if (user) {
-					req.session.isAuth = true;
-					req.session.user = user;
-					res.redirect('/');
+		user.auth(function (err, user) {
+			if (err) throw err;
+			if (user) {
+				req.session.isAuth = true;
+				req.session.user = user;
+				if (req.session.previousPage != undefined) {
+					// Redirect to the previous page prior to login page
+					// It is recorded in routes/special
+					res.redirect(req.session.previousPage);
+					delete req.session.previousPage;
 				} else {
-					req.session.err = 'Wrong email or password.';
-					res.redirect('/user/login');
+					res.redirect('/');
 				}
-			});
-		}
+			} else {
+				req.session.err = 'Wrong email or password.';
+				res.redirect('/user/login');
+			}
+		});
 	});
 
 	// Logout
