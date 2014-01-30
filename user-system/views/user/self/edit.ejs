@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title><%= title %></title>
+	</head>
+	<body>
+		<p><%=msg %></p>
+		<p>Change information</p>
+		<form action="/user/edit/<%=user._id %>" method="post">
+			<p>Name:<input name="name" type="text" value="<%=user.name %>" /></p>
+			<p>E-mail: <%=user.email %></p>
+			<p><input type="submit" value="Finish" /></p>
+		</form>
+		<p>Change password</p>
+		<form action="/user/password/edit/<%=user._id %>" method="post">
+			<p>Old password:<input name="old_password" type="password" /></p>
+			<p>New password:<input name="new_password" type="password" /></p>
+			<p><input type="submit" value="Finish" /></p>
+		</form>
+		<a href="/user/me">Cancel</a>
+	</body>
+</html>

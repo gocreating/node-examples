@@ -5,7 +5,7 @@
 	</head>
 	<body>
 		<% if (isSelf) { %>
-			<a href="/article/edit/<%=article._id %>">Edit</a>
+			<a href="/article/edit/<%=article._id %>/<%=article.author._id %>">Edit</a>
 			<a href="/article/delete/<%=article._id %>/<%=article.author._id %>">Delete</a>
 		<% } %>
 		<p>Author:<%=article.author.email %></p>

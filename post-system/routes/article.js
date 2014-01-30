@@ -3,17 +3,14 @@ var mw 		= require('./middlewares'),
 
 // To prevent blank data or injection
 function checkData(req, res, next) {
-	// if (req.body.email == '') {
-	// 	req.session.err = 'Empty email';
-	// 	res.redirect(req.route.path);
-	// 	return;
-	// }
-
-	// if (req.body.email.length > 35) {
-	// 	req.session.err = 'Email can\'t be more than 35 characters.';
-	// 	res.redirect(req.route.path);
-	// 	return;
-	// }
+	var data = req.body;
+	for(var key in data) {
+		if (data[key] == '') {
+			req.session.err = 'Empty ' + key + '.';
+			res.redirect(req.route.path);
+			return;
+		}
+	}
 	next();
 }
 
@@ -37,14 +34,14 @@ module.exports = function(app) {
 
 		article.save(function (err, newArticle) {
 			if (err) throw err;
-			res.redirect('/article/' + newArticle._id + '/' + newArticle.author._id);
+			res.redirect('/article/' + newArticle._id + '/' + newArticle.author);
 		});
 	});
 
 	// List all articles
 	app.get('/article', function (req, res) {
 		Article.find({}, '_id title author')
-			   .populate('author', 'email')
+			   .populate('author', 'name')
 			   .exec(function (err, readArticles) {
 
 			if (err) throw err;
@@ -62,7 +59,6 @@ module.exports = function(app) {
 			   .exec(function (err, readArticle) {
 
 			if (err) throw err;
-			console.log(res.locals.isSelf);
 			res.render('article/display', {
 				title: readArticle.title,
 				article: readArticle
@@ -71,7 +67,7 @@ module.exports = function(app) {
 	});
 
 	// Edit article
-	app.get('/article/edit/:id', function (req, res) {
+	app.get('/article/edit/:id/:authorId', mw.self, function (req, res) {
 		Article.findById(req.params.id)
 			   .populate('author', 'email')
 			   .exec(function (err, readArticle) {
@@ -93,7 +89,7 @@ module.exports = function(app) {
 
 		Article.findByIdAndUpdate(req.params.id, updateArticle, function (err, readArticle) {
 			if (err) throw err;
-			res.redirect('/article/' + req.params.id);
+			res.redirect('/article/' + req.params.id + '/' + req.params.authorId);
 		});
 	});
 

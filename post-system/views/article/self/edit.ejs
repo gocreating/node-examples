@@ -4,9 +4,8 @@
 		<title><%= title %></title>
 	</head>
 	<body>
-		<form action="/article/edit/<%=article._id %>" method="post">
+		<form action="/article/edit/<%=article._id %>/<%=article.author._id %>" method="post">
 			<p><%=msg %></p>
-			<input name="uid" type="hidden" value="<%=article.author._id %>" />
 			<p>
 				<input
 					name="title"
@@ -17,7 +16,7 @@
 			<p>
 				<textarea name="content" placeholder="Content"><%=article.content %></textarea>
 			</p>
-			<a href="/article/<%=article._id %>">Cancel</a>
+			<a href="/article/<%=article._id %>/<%=article.author._id %>">Cancel</a>
 			<p><input type="submit" value="Update" /></p>
 		</form>
 	</body>

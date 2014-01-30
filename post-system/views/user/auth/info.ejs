@@ -5,6 +5,7 @@
 	</head>
 	<body>
 		<p><%=msg %></p>
+		<a href="/user/edit/<%=user._id %>">Edit</a>
 		<p>This page is only accessible for an authorized user.</p>
 		<p>Your information:<%=JSON.stringify(user) %></p>
 		<a href="/">Go Home</a>

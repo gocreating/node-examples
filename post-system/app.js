@@ -62,7 +62,7 @@ app.configure(function() {
 
 		// respond with html page
 		if (req.accepts('html')) {
-			res.render('err/notFound', {
+			res.render('err/404', {
 				title: 'Page not found'
 			});
 			return;

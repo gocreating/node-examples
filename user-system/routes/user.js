@@ -3,30 +3,18 @@ var mw   = require('./middlewares'),
 
 // To prevent blank data or injection
 function checkData(req, res, next) {
-	if (req.body.email == '') {
-		req.session.err = 'Empty email';
-		res.redirect(req.route.path);
-		return;
+	var data = req.body;
+	for(var key in data) {
+		if (data[key] == '') {
+			req.session.err = 'Empty ' + key + '.';
+			if (req.route.path == '/user/password/edit/:authorId') {
+				res.redirect('/user/edit/' + req.params.authorId);
+			} else {
+				res.redirect(req.url);
+			}
+			return;
+		}
 	}
-
-	if (req.body.password == '') {
-		req.session.err = 'Empty password.';
-		res.redirect(req.route.path);
-		return;
-	}
-
-	if (req.body.email.length > 35) {
-		req.session.err = 'Email can\'t be more than 35 characters.';
-		res.redirect(req.route.path);
-		return;
-	}
-
-	if (req.body.password.length > 35) {
-		req.session.err = 'Password can\'t be more than 35 characters.';
-		res.redirect(req.route.path);
-		return;
-	}
-
 	next();
 }
 
@@ -40,12 +28,10 @@ module.exports = function(app) {
 	});
 
 	app.post('/user/register', checkData, function(req, res) {
-		var email    = req.body.email;
-		var password = req.body.password;
-
 		var user = new User({
-			email: email,
-			password: password
+			name: 		   req.body.name,
+			email: 		   req.body.email,
+			password: 	   req.body.password
 		});
 
 		// Check whether the email exists
@@ -71,12 +57,9 @@ module.exports = function(app) {
 	});
 
 	app.post('/user/login', mw.unauth, checkData, function(req, res) {
-		var email    = req.body.email;
-		var password = req.body.password;
-
 		var user = new User({
-			email: email,
-			password: password
+			email: 		   req.body.email,
+			password: 	   req.body.password
 		});
 
 		user.auth(function (err, user) {
@@ -86,9 +69,8 @@ module.exports = function(app) {
 				req.session.user = user;
 				if (req.session.previousPage != undefined) {
 					// Redirect to the previous page prior to login page
-					// It is recorded in mw.unauth
+					// It is recorded in middlewares.js
 					res.redirect(req.session.previousPage);
-					delete req.session.previousPage;
 				} else {
 					res.redirect('/');
 				}
@@ -107,8 +89,53 @@ module.exports = function(app) {
 		res.redirect('/');
 	});
 
-	// Auth pages
-	app.get('/user/auth/info', mw.auth, function(req, res) {
+	// Edit
+	app.get('/user/edit/:authorId', mw.self, function(req, res) {
+		req.session.previousPage = req.url;
+		console.log('===================');
+		console.log(req.session.previousPage);
+		console.log('===================');
+
+		User.findById(req.params.authorId, 'name email', function (err, readUser) {
+			if (err) throw err;
+				res.render('user/self/edit', {
+				title: 'Edit User Information',
+				user: readUser
+			});
+		});
+	});
+
+	app.post('/user/edit/:authorId', mw.self, checkData, function(req, res) {
+		User.findByIdAndUpdate(
+			req.params.authorId,
+			{name: req.body.name},
+			function (err, readUser) {
+				if (err) throw err;
+				req.session.user.name = req.body.name;
+				res.redirect('/user/me');
+			}
+		);
+	});
+
+	app.post('/user/password/edit/:authorId', mw.self, checkData, function(req, res) {
+		User.findOneAndUpdate(
+			{_id: req.params.authorId, password: req.body.old_password},
+			{password: req.body.new_password},
+			function (err, readUser) {
+				if (err) throw err;
+				if (readUser) {
+					req.session.succ = 'Your password is updated.';
+					res.redirect('/user/me');
+				} else {
+					req.session.err = 'Wrong old password.';
+					res.redirect('/user/edit/' + req.params.authorId);
+				}
+			}
+		);
+	});
+
+	// Information
+	app.get('/user/me', mw.auth, function(req, res) {
 		res.render('user/auth/info', {
 			title: 'User Information',
 			user: req.session.user
