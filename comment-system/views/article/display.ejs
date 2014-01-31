@@ -15,19 +15,38 @@
 		<p>Last edit time:<%=article.lastEditTime %></p>
 		<p>Content:<%=article.content %></p>
 		<hr>
+		<!-- Comment List -->
 		<ul>
 		<% article.comments.forEach(function (comment) { %>
-			<li><%= comment.author.name %>:<%=comment.content %></li>
+			<li>
+				<%=comment.author.name %>:<%=comment.content %>
+				<ul>
+					<% if (comment.replies.length != 0) { %>
+						<li><a><%=comment.replies.length %> replies</a></li>
+					<% } %>
+					<% if (isAuth) { %>
+						<li>
+							<form action="/comment/reply/<%=comment._id %>" method="post">
+								<input name="articleId" type="hidden" value="<%=article._id %>" >
+								<%=user.name %>: <input name="content" type="text" >
+								<input type="submit" value="Reply" >
+							</form>
+						</li>
+					<% } %>
+				</ul>
+			</li>
 		<% }); %>
+			<li>
+				<% if (isAuth) { %>
+					<form action="/article/comment/<%=article._id %>" method="post">
+						<%=user.name %>: <input name="content" type="text" >
+						<input type="submit" value="Comment" >
+					</form>
+				<% } else { %>
+					<a href="/user/login">Login</a> to leave a comment.
+				<% }%>
+			</li>
 		</ul>
-		<% if (isAuth) { %>
-			<form action="/article/comment/<%=article._id %>" method="post">
-				<p><%=user.name %>: <input name="content" type="text" ></p>
-				<p><input type="submit" value="Leave comment" ></p>
-			</form>
-		<% } else { %>
-			<a href="/user/login">Login</a> to leave a comment.
-		<% }%>
 		<hr>
 		<a href="/article">Go to Article List</a>
 	</body>

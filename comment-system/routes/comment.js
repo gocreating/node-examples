@@ -36,26 +36,40 @@ module.exports = function(app) {
 		});
 
 		var Article = require('../models/article');
-		Article.findByIdAndUpdate(
-			req.params.articleId,
-			{$push: {comments: newComment}}).populate('comments').exec(
-			function (err, readArticle) {
-				if (err) throw err;
-				newComment.save();
-				res.redirect('/article/' + req.params.articleId + '/' + readArticle.author);
-			}
-		);
+		Article
+			.findByIdAndUpdate(
+				req.params.articleId,
+				{$push: {comments: newComment}}
+			)
+			.populate('comments')
+			.exec(
+				function (err, readArticle) {
+					if (err) throw err;
+					newComment.save();
+					res.redirect('/article/' + req.params.articleId + '/' + readArticle.author);
+				}
+			);
 	});
 
-	// Read replies of some comment
-	app.get('/reply/:id', mw.auth, function (req, res) {
-		Comment.findById(req.params.id)
-			   .populate('replies')
-			   .exec(
-			function (err, readComment) {
-				if (err) throw err;
-				console.log(readComment);
-			}
-		);
+	// Add replies to some comment
+	app.post('/comment/reply/:id', mw.auth, function (req, res) {
+		var newComment = new Comment({
+			author: req.session.user._id,
+			content: req.body.content
+		});
+
+		Comment
+			.findByIdAndUpdate(
+				req.params.id,
+				{$push: {replies: newComment}}
+			)
+			.populate('replies')
+			.exec(
+				function (err, addedComment) {
+					if (err) throw err;
+					newComment.save()
+					res.redirect('/article/' + req.body.articleId + '/' + req.session.user._id);
+				}
+			);
 	});
 };
