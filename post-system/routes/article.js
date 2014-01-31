@@ -42,14 +42,15 @@ module.exports = function(app) {
 	app.get('/article', function (req, res) {
 		Article.find({}, '_id title author')
 			   .populate('author', 'name')
-			   .exec(function (err, readArticles) {
-
-			if (err) throw err;
-			res.render('article/list', {
-				title: 'Article List',
-				articles: readArticles
-			});
-		});
+			   .exec(
+			function (err, readArticles) {
+				if (err) throw err;
+				res.render('article/list', {
+					title: 'Article List',
+					articles: readArticles
+				});
+			}
+		);
 	});
 
 	// Display some article

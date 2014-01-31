@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title><%= title %></title>
+	</head>
+	<body>
+		<form action="/article/edit/<%=article._id %>/<%=article.author._id %>" method="post">
+			<p><%=msg %></p>
+			<p>
+				<input
+					name="title"
+					type="text"
+					placeholder="Title"
+					value="<%=article.title %>" />
+			</p>
+			<p>
+				<textarea name="content" placeholder="Content"><%=article.content %></textarea>
+			</p>
+			<a href="/article/<%=article._id %>/<%=article.author._id %>">Cancel</a>
+			<p><input type="submit" value="Update" /></p>
+		</form>
+	</body>
+</html>
