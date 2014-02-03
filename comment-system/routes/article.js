@@ -40,9 +40,10 @@ module.exports = function(app) {
 
 	// List all articles
 	app.get('/article', function (req, res) {
-		Article.find({}, '_id title author')
-			   .populate('author', 'name')
-			   .exec(
+		Article
+		.find({}, '_id title author')
+		.populate('author', 'name')
+		.exec(
 			function (err, readArticles) {
 				if (err) throw err;
 				res.render('article/list', {
@@ -54,23 +55,18 @@ module.exports = function(app) {
 	});
 
 	// Display some article
-	// Usage of deep populate,
-	// Reference: https://groups.google.com/forum/#!topic/mongoose-orm/yuKEqiu4JHI
 	app.get('/article/:id/:authorId', mw.checkSelf, function (req, res) {
-		Article.findById(req.params.id)
-			   .populate('author', 'name')
-			   .populate('comments')
-			   .exec(
-			function (err, doc) {
+		Article
+		.findById(req.params.id)
+		.populate('author', 'name')
+		.populate('comments')
+		.exec(
+			function (err, readArticle) {
 				if (err) throw err;
-				var User = require('../models/user');
-				User.populate(doc, 'comments.author', function (err, readArticle) {
-					if (err) throw err;
-					res.render('article/display', {
-						title: readArticle.title,
-						article: readArticle,
-						user: req.session.user
-					});
+				res.render('article/display', {
+					title: readArticle.title,
+					article: readArticle,
+					user: req.session.user
 				});
 			}
 		);
@@ -105,8 +101,11 @@ module.exports = function(app) {
 
 	// Delete article
 	app.get('/article/delete/:id/:authorId', mw.self, function (req, res) {
-		Article.findByIdAndRemove(req.params.id, function (err, deleteArticle) {
+		Article
+		.findByIdAndRemove(req.params.id)
+		.exec(function (err, readArticle) {
 			if (err) throw err;
+			mw.removeComments(readArticle.comments.toObject());
 			res.redirect('/article');
 		});
 	});

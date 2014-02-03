@@ -1,3 +1,5 @@
+var Comment = require('../models/comment');
+
 /********************
  * Auth middlewares *
  ********************/
@@ -76,3 +78,19 @@ exports.isSelf = function (req, uid) {
 	}
 	return false;
 }
+
+// Recursively remove comments
+exports.removeComments = function removeComments (arrComments) {
+	Comment
+	.find({_id: {$in: arrComments}})
+	.populate('replies')
+	.exec(function (err, readReplies) {
+		if (err) throw err;
+		for (var i in readReplies) {
+			var comment = readReplies[i];
+			console.log(comment.content);
+			comment.remove();
+			removeComments(comment.replies);
+		}
+	});
+};

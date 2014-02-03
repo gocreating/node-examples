@@ -7,7 +7,7 @@ function checkData(req, res, next) {
 	for(var key in data) {
 		if (data[key] == '') {
 			req.session.err = 'Empty ' + key + '.';
-			res.redirect(req.route.path);
+			res.redirect(req.url);
 			return;
 		}
 	}
@@ -26,7 +26,7 @@ module.exports = function(app) {
 	app.post('/article/post', mw.auth, checkData, function (req, res) {
 		var article = new Article({
 			author: req.session.user._id,
-			postTime: new Date(),
+			createTime: new Date(),
 			lastEditTime: new Date(),
 			title: req.body.title,
 			content: req.body.content
@@ -40,9 +40,10 @@ module.exports = function(app) {
 
 	// List all articles
 	app.get('/article', function (req, res) {
-		Article.find({}, '_id title author')
-			   .populate('author', 'name')
-			   .exec(
+		Article
+		.find({}, '_id title author')
+		.populate('author', 'name')
+		.exec(
 			function (err, readArticles) {
 				if (err) throw err;
 				res.render('article/list', {
@@ -55,16 +56,20 @@ module.exports = function(app) {
 
 	// Display some article
 	app.get('/article/:id/:authorId', mw.checkSelf, function (req, res) {
-		Article.findById(req.params.id)
-			   .populate('author', 'email')
-			   .exec(function (err, readArticle) {
-
-			if (err) throw err;
-			res.render('article/display', {
-				title: readArticle.title,
-				article: readArticle
-			});
-		});
+		Article
+		.findById(req.params.id)
+		.populate('author', 'name')
+		.populate('comments')
+		.exec(
+			function (err, readArticle) {
+				if (err) throw err;
+				res.render('article/display', {
+					title: readArticle.title,
+					article: readArticle,
+					user: req.session.user
+				});
+			}
+		);
 	});
 
 	// Edit article
