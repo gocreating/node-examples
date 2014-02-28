@@ -155,20 +155,21 @@ module.exports = function(app) {
 			function (err, readUser) {
 				if (err) throw err;
 				if (readUser) {
-					var nodemailer = require("nodemailer");
+					var nodemailer = require('nodemailer'),
+						config = require('../config');
 
 					// create reusable transport method (opens pool of SMTP connections)
-					var smtpTransport = nodemailer.createTransport("SMTP",{
-					    service: "Gmail",
+					var smtpTransport = nodemailer.createTransport('SMTP',{
+					    service: 'Gmail',
 					    auth: {
-					        user: "gocreating@gmail.com",
-					        pass: "1j6ul4y942l4xk7"
+					        user: config.email.user,
+					        pass: config.email.password
 					    }
 					});
 
 					// setup e-mail data with unicode symbols
 					var mailOptions = {
-					    from: 'Company <foo@blurdybloop.com>', // sender address
+					    from: 'Company <' + config.email.user + '>', // sender address
 					    to: req.body.email, // list of receivers
 					    subject: 'New password', // Subject line
 					    text: 'New password', // plaintext body
@@ -178,7 +179,14 @@ module.exports = function(app) {
 					// send mail with defined transport object
 					smtpTransport.sendMail(mailOptions, function(err, response){
 					    if (err) {
-					    	req.session.err = 'Wrong email address.';
+					    	if (err.name == 'RecipientError') {
+					    		req.session.err = 'Wrong email address.';
+					    	} else if (err.name == 'AuthError') {
+					    		// Remember to set up email user and password in config.js
+					    		req.session.err = 'Sender account auth error.';
+					    	} else {
+					    		req.session.err = 'Unexpected error.';
+					    	}
 					    } else {
 					        req.session.succ = 'We have sent a new password to you. Please check your email.';
 					    }
