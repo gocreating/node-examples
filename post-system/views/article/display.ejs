@@ -1,19 +1,12 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<title><%= title %></title>
-	</head>
-	<body>
-		<% if (isSelf) { %>
-			<a href="/article/edit/<%=article._id %>/<%=article.author._id %>">Edit</a>
-			<a href="/article/delete/<%=article._id %>/<%=article.author._id %>">Delete</a>
-		<% } %>
-		<p>Author:<%=article.author.name %></p>
-		<hr>
-		<p>Title:<%=article.title %></p>
-		<p>Post time:<%=article.createTime %></p>
-		<p>Last edit time:<%=article.lastEditTime %></p>
-		<p>Content:<%=article.content %></p>
-		<a href="/article">Go to Article List</a>
-	</body>
-</html>
+<%- contentFor('body') %>
+<% if (isSelf) { %>
+	<a href="/article/edit/<%=article._id %>/<%=article.author._id %>">Edit</a>
+	<a href="/article/delete/<%=article._id %>/<%=article.author._id %>">Delete</a>
+<% } %>
+<p>Author:<%=article.author.name %></p>
+<hr>
+<p>Title:<%=article.title %></p>
+<p>Post time:<%=article.createTime %></p>
+<p>Last edit time:<%=article.lastEditTime %></p>
+<p>Content:<%=article.content %></p>
+<a href="/article">Go to Article List</a>

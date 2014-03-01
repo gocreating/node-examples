@@ -1,15 +1,8 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<title><%= title %></title>
-	</head>
-	<body>
-		<form action="/article/post" method="post">
-			<p><%=msg %></p>
-			<p><input name="title" type="text" placeholder="Title" /></p>
-			<p><textarea name="content" placeholder="Content"></textarea></p>
-			<p><input type="submit" value="Post" /></p>
-		</form>
-		<a href="/">Go Home</a>
-	</body>
-</html>
+<%- contentFor('body') %>
+<form action="/article/post" method="post">
+	<p><%=msg %></p>
+	<p><input name="title" type="text" placeholder="Title" /></p>
+	<p><textarea name="content" placeholder="Content"></textarea></p>
+	<p><input type="submit" value="Post" /></p>
+</form>
+<a href="/">Go Home</a>
