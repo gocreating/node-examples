@@ -1,37 +1,30 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<title><%= title %></title>
-	</head>
-	<body>
-		<% if (isSelf) { %>
-			<a href="/article/edit/<%=article._id %>/<%=article.author._id %>">Edit</a>
-			<a href="/article/delete/<%=article._id %>/<%=article.author._id %>">Delete</a>
-		<% } %>
-		<p>Author:<%=article.author.name %></p>
-		<hr>
-		<p>Title:<%=article.title %></p>
-		<p>Post time:<%=article.createTime %></p>
-		<p>Last edit time:<%=article.lastEditTime %></p>
-		<p>Content:<%=article.content %></p>
-		<hr>
-		<!-- Comment List -->
-		<a href="/comment/article/<%=article._id %>">Read comments</a>
-		<!-- The path to read replies -->
-		<!-- <a href="/comment/reply/comment._id">
-			comment.replies.length replies
-		</a> -->
-		
-		<% if (isAuth) { %>
-			<form action="/article/comment/<%=article._id %>" method="post">
-				<%=user.name %>: <input name="content" type="text" >
-				<input type="submit" value="Comment" >
-			</form>
-		<% } else { %>
-			<a href="/user/login">Login</a> to leave a comment.
-		<% }%>
-		
-		<hr>
-		<a href="/article">Go to Article List</a>
-	</body>
-</html>
+<%- contentFor('body') %>
+<% if (isSelf) { %>
+	<a href="/article/edit/<%=article._id %>/<%=article.author._id %>">Edit</a>
+	<a href="/article/delete/<%=article._id %>/<%=article.author._id %>">Delete</a>
+<% } %>
+<p>Author:<%=article.author.name %></p>
+<hr>
+<p>Title:<%=article.title %></p>
+<p>Post time:<%=article.createTime %></p>
+<p>Last edit time:<%=article.lastEditTime %></p>
+<p>Content:<%=article.content %></p>
+<hr>
+<!-- Comment List -->
+<a href="/comment/article/<%=article._id %>">Read comments</a><br>
+<!-- The path to read replies -->
+<!-- <a href="/comment/reply/comment._id">
+	comment.replies.length replies
+</a> -->
+
+<% if (isAuth) { %>
+	<form action="/article/comment/<%=article._id %>" method="post">
+		<%=user.name %>: <input name="content" type="text" >
+		<input type="submit" value="Comment" >
+	</form>
+<% } else { %>
+	<a href="/user/login">Login</a> to leave a comment.
+<% }%>
+
+<hr>
+<a href="/article">Go to Article List</a>

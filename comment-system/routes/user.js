@@ -1,6 +1,11 @@
 var mw   = require('./middlewares'),
 	User = require('../models/user');
 
+function makePassword (length, sourceString) {
+  var index = (Math.random() * (sourceString.length - 1)).toFixed(0);
+  return length > 0 ? sourceString[index] + makePassword(length - 1, sourceString) : '';
+};
+
 // To prevent blank data or injection
 function checkData(req, res, next) {
 	var data = req.body;
@@ -43,7 +48,7 @@ module.exports = function(app) {
 				user.save(function (err, newUser) {
 					if (err) throw err;
 					req.session.succ = 'Register successfully';
-					res.redirect('/user/register');
+					res.redirect('/');
 				});
 			}
 		});
@@ -58,8 +63,8 @@ module.exports = function(app) {
 
 	app.post('/user/login', mw.unauth, checkData, function(req, res) {
 		var user = new User({
-			email: 		   req.body.email,
-			password: 	   req.body.password
+			email: 	  req.body.email,
+			password: req.body.password
 		});
 
 		user.auth(function (err, user) {
@@ -129,6 +134,68 @@ module.exports = function(app) {
 				} else {
 					req.session.err = 'Wrong old password.';
 					res.redirect('/user/edit/' + req.params.authorId);
+				}
+			}
+		);
+	});
+
+	// Forget password
+	app.get('/user/password/reset', function(req, res) {
+		res.render('user/resetPassword', {
+			title: 'Reset password'
+		});
+	});
+
+	app.post('/user/password/reset', checkData, function(req, res) {
+		var newPassword = makePassword(15, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+
+		User.findOneAndUpdate(
+			{email: req.body.email},
+			{password: newPassword},
+			function (err, readUser) {
+				if (err) throw err;
+				if (readUser) {
+					var nodemailer = require('nodemailer'),
+						config = require('../config');
+
+					// create reusable transport method (opens pool of SMTP connections)
+					var smtpTransport = nodemailer.createTransport('SMTP',{
+					    service: 'Gmail',
+					    auth: {
+					        user: config.email.user,
+					        pass: config.email.password
+					    }
+					});
+
+					// setup e-mail data with unicode symbols
+					var mailOptions = {
+					    from: 'Company <' + config.email.user + '>', // sender address
+					    to: req.body.email, // list of receivers
+					    subject: 'New password', // Subject line
+					    text: 'New password', // plaintext body
+					    html: '<b>New password: ' + newPassword + '</b>' // html body
+					}
+
+					// send mail with defined transport object
+					smtpTransport.sendMail(mailOptions, function(err, response){
+					    if (err) {
+					    	if (err.name == 'RecipientError') {
+					    		req.session.err = 'Wrong email address.';
+					    	} else if (err.name == 'AuthError') {
+					    		// Remember to set up email user and password in config.js
+					    		req.session.err = 'Sender account auth error.';
+					    	} else {
+					    		req.session.err = 'Unexpected error.';
+					    	}
+					    } else {
+					        req.session.succ = 'We have sent a new password to you. Please check your email.';
+					    }
+				        res.redirect('/user/password/reset');
+					});
+
+				} else {
+					req.session.err = 'This email doesn\'t match any user.';
+					res.redirect('/user/password/reset');
 				}
 			}
 		);
