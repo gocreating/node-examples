@@ -1,11 +1,4 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<title><%= title %></title>
-	</head>
-	<body>
-		<p>You are not authorized.</p>
-		<p>Please <a href="/user/login">login</a> first.</p>
-		<a href="/">Go Home</a>
-	</body>
-</html>
+<%- contentFor('body') %>
+<p>You are not authorized.</p>
+<p>Please <a href="/user/login">login</a> first.</p>
+<a href="/">Go Home</a>

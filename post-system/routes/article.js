@@ -59,7 +59,7 @@ module.exports = function(app) {
 		Article
 		.findById(req.params.id)
 		.populate('author', 'name')
-		.populate('comments')
+		/*.populate('comments')*/
 		.exec(
 			function (err, readArticle) {
 				if (err) throw err;

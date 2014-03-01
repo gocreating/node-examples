@@ -5,8 +5,8 @@ var articleSchema = new mongoose.Schema({
 	createTime:	  Date,
 	lastEditTime: Date,
 	title: 		  String,
-	content: 	  String,
-	comments: 	  [{type: mongoose.Schema.ObjectId, ref: 'comments', default: null}]
+	content: 	  String/*,
+	comments: 	  [{type: mongoose.Schema.ObjectId, ref: 'comments', default: null}]*/
 });
 
 module.exports = mongoose.model('articles', articleSchema);
