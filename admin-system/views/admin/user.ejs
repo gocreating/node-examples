@@ -1,0 +1,90 @@
+<%- contentFor('body') %>
+<%
+function convert(dateString) {
+	if (dateString) {
+		var d = new Date(dateString);
+		return d.getFullYear() + '-' +
+				('0' + (d.getMonth() + 1)).slice(-2) + '-' +
+				('0' + (d.getDate())).slice(-2) + ' ' +
+				('0' + d.getHours()).slice(-2) + ':' +
+				('0' + d.getMinutes()).slice(-2) + ':' +
+				('0' + d.getSeconds()).slice(-2);
+	} else {
+		return '-';
+	}
+}
+%>
+
+<div class="row">
+	<div class="col-lg-12">
+		<h1 class="page-header">User Management</h1>
+		<%- include ../template/alert %>
+	</div>
+	<!-- /.col-lg-12 -->
+</div>
+
+<div class="row">
+	<div class="col-lg-12">
+		<div class="table-responsive">
+			<table class="table table-striped table-bordered table-hover" id="users">
+				<thead>
+					<tr>
+						<th class="text-center">Name</th>
+						<th class="text-center">E-mail</th>
+						<th class="text-center">Last Login</th>
+						<th class="text-center">Register Time</th>
+						<th class="text-center">Login Count</th>
+						<th class="text-center">Operation</th>
+					</tr>
+				</thead>
+				<tbody>
+					<% users.forEach(function (user) { %>
+						<tr class="text-center">
+							<td><%=user.name %></td>
+							<td><%=user.email %></td>
+							<td><%=convert(user.lastLoginTime) %></td>
+							<td><%=convert(user.registerTime) %></td>
+							<td><%=user.loginCount %></td>
+							<td>
+								<a href="#" type="button" class="btn btn-info btn-xs">Detail</a>
+								<a href="#" type="button" class="btn btn-warning btn-xs">Edit</a>
+								<div class="btn-group">
+									<button type="button" class="btn btn-danger btn-xs dropdown-toggle" data-toggle="dropdown">Others <span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu pull-right" role="menu">
+										<li><a href="#">Send mail</a></li>
+										<li><a href="#">Delete</a></li>
+									</ul>
+								</div>
+							</td>
+						</tr>
+					<% }); %>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<!-- /.col-lg-12 -->
+</div>
+
+<link href="/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+
+<script src="/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+
+<script>
+	$(document).ready(function() {
+		$('#users').dataTable({
+			"oLanguage": {
+				"sSearch": "搜尋: ",
+				"sInfo": "目前顯示第 _START_ ~ _END_ 筆紀錄 ( 共 _TOTAL_ 筆 )",
+				"sInfoEmpty": "查無資料",
+				"sInfoFiltered": " - 從 _MAX_ 筆紀錄中過濾",
+				"sLengthMenu": "每頁顯示 _MENU_ 筆紀錄",
+				"oPaginate": {
+					"sPrevious": "上一頁",
+					"sNext": "下一頁"
+				}
+			}
+		});
+	});
+</script>
