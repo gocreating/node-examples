@@ -1,0 +1,15 @@
+.breadcrumb {
+	/*border-radius: 0px;*/
+}
+
+.clear-padding {
+	margin: 0 -30px;
+}
+
+.clear-padding .breadcrumb {
+	margin-bottom: 0px;
+}
+
+.clear-padding > * {
+	border-radius: 0px;	
+}

@@ -1,5 +1,6 @@
-var mw   = require('./middlewares'),
-	User = require('../models/user');
+var mw 		= require('./middlewares'),
+	User 	= require('../models/user'),
+	Article = require('../models/article');
 
 module.exports = function(app) {
 	// Home
@@ -16,13 +17,39 @@ module.exports = function(app) {
 		.find(
 			{},
 			'name email registerTime lastLoginTime loginCount',
-			function (err, userList) {
+			function (err, readUsers) {
 				if (err) throw err;
-				res.render('admin/user', {
+				res.render('admin/user/list', {
 					layout: 'layout/admin',
-					title: 'user',
-					users: userList
+					title: 'user list',
+					users: readUsers
 				});
+			}
+		);
+	});
+
+	app.get('/admin/user/:userId', function (req, res) {
+		User
+		.findById(
+			req.params.userId,
+			'name email registerTime lastLoginTime loginCount',
+			function (err, readUser) {
+				if (err) throw err;
+
+				Article
+				.find(
+					{author: req.params.userId},
+					function (err, readArticles) {
+						if (err) throw err;
+						console.log(readUser);
+						res.render('admin/user/detail', {
+							layout: 'layout/admin',
+							title: 'user detail',
+							user: readUser,
+							articles: readArticles
+						});
+					}
+				);
 			}
 		);
 	});

@@ -1,0 +1,58 @@
+<%- contentFor('body') %>
+<%
+function convert(dateString) {
+	if (dateString) {
+		var d = new Date(dateString);
+		return d.getFullYear() + '-' +
+				('0' + (d.getMonth() + 1)).slice(-2) + '-' +
+				('0' + (d.getDate())).slice(-2) + ' ' +
+				('0' + d.getHours()).slice(-2) + ':' +
+				('0' + d.getMinutes()).slice(-2) + ':' +
+				('0' + d.getSeconds()).slice(-2);
+	} else {
+		return '-';
+	}
+}
+%>
+
+<div class="row clear-padding">
+	<ol class="breadcrumb">
+		<li><a href="/admin/user">User Management</a></li>
+		<li class="active">Detail</li>
+	</ol>
+	<%- include ../../template/alert %>
+</div>
+
+<div class="row">
+	<div class="col-lg-12">
+		<h1 class="page-header">
+			User Detail
+		</h1>
+	</div>
+	<!-- /.col-lg-12 -->
+</div>
+
+<div class="row">
+	<div class="col-lg-3">
+		<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAiIGhlaWdodD0iMTQwIj48cmVjdCB3aWR0aD0iMTQwIiBoZWlnaHQ9IjE0MCIgZmlsbD0iI2VlZSI+PC9yZWN0Pjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjcwIiB5PSI3MCIgc3R5bGU9ImZpbGw6I2FhYTtmb250LXdlaWdodDpib2xkO2ZvbnQtc2l6ZToxMnB4O2ZvbnQtZmFtaWx5OkFyaWFsLEhlbHZldGljYSxzYW5zLXNlcmlmO2RvbWluYW50LWJhc2VsaW5lOmNlbnRyYWwiPjE0MHgxNDA8L3RleHQ+PC9zdmc+" alt="..." class="img-thumbnail">
+	</div>
+	<!-- /.col-lg-3 -->
+	<div class="col-lg-9">
+		<table class="table table-hover">
+			<thead>
+				<th>Key</th>
+				<th>Value</th>
+			</thead>
+			<tbody>
+				<tr><td>UID</td><td><%=user._id %></td></tr>
+				<tr><td>Name</td><td><%=user.name %></td></tr>
+				<tr><td>Email</td><td><%=user.email %></td></tr>
+				<tr><td>Register Time</td><td><%=convert(user.registerTime) %></td></tr>
+				<tr><td>Last Login</td><td><%=convert(user.lastLoginTime) %></td></tr>
+				<tr><td>Login Count</td><td><%=user.loginCount %></td></tr>
+				<tr><td>Article Count</td><td><%=articles.length %></td></tr>
+			</tbody>
+		</table>
+	</div>
+	<!-- /.col-lg-9 -->
+</div>
